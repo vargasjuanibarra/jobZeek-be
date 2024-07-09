@@ -10,10 +10,10 @@ const app = express();
 const PORT = 5000
 
 app.use(express.json());
-app.use(express.urlencoded())
+app.use(express.urlencoded({extended: false}))
 
-app.use('/api/jobs', JobRoutes)
-app.use('/api/user', UserRoutes)
+app.use('/jobs', JobRoutes)
+app.use('/user', UserRoutes)
 
 app.listen(PORT, () => {
     console.log(`server running on port ${PORT}`);
