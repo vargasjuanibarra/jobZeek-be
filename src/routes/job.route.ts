@@ -153,4 +153,10 @@ router.delete('/:jobId', async(req: Request, res: Response) => {
     
 })
 
+router.get('/search/:searchTerm', async(req: Request, res: Response) => {
+    const searchRegex = new RegExp(req.params.searchTerm, 'i')
+    const jobs = await JobModel.find({title: { $regex: searchRegex }});
+    res.status(HTTP_OK).send(jobs)
+})
+
 export {router as JobRoutes};
