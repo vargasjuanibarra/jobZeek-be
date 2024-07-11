@@ -31,21 +31,6 @@ router.get('/', async(req: Request, res:Response) => {
     res.status(HTTP_OK).send(jobs)
 })
 
-router.get('/:jobId', async(req: Request, res: Response) => {
-    const job = await JobModel.findById(req.params.jobId)
-
-    if (!job) {
-        if (!job) {
-            res.status(HTTP_BAD_REQUEST).send({
-                message: 'No job found'
-            })
-            throw new Error('Error! No job found')
-        }
-    }
-    console.log(job);
-    res.status(HTTP_OK).send(job);
-})
-
 router.post('/', async(req: Request, res: Response) => {
     const { 
         title, 
@@ -153,10 +138,44 @@ router.delete('/:jobId', async(req: Request, res: Response) => {
     
 })
 
-router.get('/search/:searchTerm', async(req: Request, res: Response) => {
-    const searchRegex = new RegExp(req.params.searchTerm, 'i')
-    const jobs = await JobModel.find({title: { $regex: searchRegex }});
-    res.status(HTTP_OK).send(jobs)
+router.get('/search', async (req: Request, res: Response) => {
+    const { searchTerm, jobTypes } = req.query;
+    console.log(req.query);
+
+    let query: any = {};
+
+    if (searchTerm) {
+        const searchRegex = new RegExp(searchTerm as string, 'i');
+        query.title = { $regex: searchRegex };
+    }
+
+    if (jobTypes) {
+        const jobTypesArray = (jobTypes as string).split(',');
+        query.type = { $in: jobTypesArray };
+    }
+
+    try {
+        const jobs = await JobModel.find(query);
+        res.status(HTTP_OK).send(jobs);
+    } catch (error) {
+        res.status(500).send({ error: 'Error fetching jobs' });
+    }
+});
+
+// needs to be defined last so that wont get triggered when calling the /search endpoint
+router.get('/:jobId', async(req: Request, res: Response) => {
+    const job = await JobModel.findById(req.params.jobId)
+
+    if (!job) {
+        if (!job) {
+            res.status(HTTP_BAD_REQUEST).send({
+                message: 'No job found'
+            })
+            throw new Error('Error! No job found')
+        }
+    }
+    console.log(job);
+    res.status(HTTP_OK).send(job);
 })
 
 export {router as JobRoutes};
