@@ -56,7 +56,6 @@ router.post('/login', async (req: Request, res: Response, next: NextFunction) =>
         res.status(HTTP_BAD_REQUEST).send({
             message: 'Invalid email and passord'
         })
-        throw new Error('Error! Invalid email and passord')
     }
 })
 
