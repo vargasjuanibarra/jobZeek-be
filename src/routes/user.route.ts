@@ -20,29 +20,35 @@ router.get('/', async (req: Request, res: Response) => {
 })
 
 router.post('/register', async (req: Request, res: Response) => {
-    const { email, password } = req.body;
-    console.log(email);
+    const { fullName, email, password, dateOfBirth } = req.body;
 
     const user = await UserModel.findOne({email})
 
-    if (user) {
-        res.status(HTTP_BAD_REQUEST).send({
-            message: 'User already Exists!'
-        })
-        throw new Error('Error! User already Exists');
+    try {
+        if (user) {
+            res.status(HTTP_BAD_REQUEST).send({
+                message: 'User already Exists!'
+            })
+            res.status(HTTP_BAD_REQUEST).send({ message:'Error! User already Exists'});
+        }
+    
+        const encryptPassword = await bcrypt.hash(password, 10)
+    
+        const newUser = {
+            id: '',
+            fullName: fullName,
+            email: email.toLowerCase(),
+            password: encryptPassword,
+            dateOfBirth,
+            isAdmin: false
+        }
+    
+        const saveUser = await UserModel.create(newUser);
+        res.status(HTTP_OK).send(generateUserToken(saveUser));
+    } catch (error) {
+        console.log('Error on register', error)
     }
-
-    const encryptPassword = await bcrypt.hash(password, 10)
-
-    const newUser = {
-        id: '',
-        email: email.toLowerCase(),
-        password: encryptPassword,
-        isAdmin: false
-    }
-
-    const saveUser = await UserModel.create(newUser);
-    res.status(HTTP_OK).send(generateUserToken(saveUser));
+    
 })
 
 router.post('/login', async (req: Request, res: Response, next: NextFunction) => {
