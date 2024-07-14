@@ -6,8 +6,8 @@ import jwt from 'jsonwebtoken';
 
 const router = express.Router();
 
-router.get('/', async (req: Request, res: Response) => {
-    const { id } = req.body
+router.get('/:id', async (req: Request, res: Response) => {
+    const { id } = req.params
     const user = await UserModel.findById(id);
 
     if (!user) {
