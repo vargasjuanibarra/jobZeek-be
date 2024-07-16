@@ -8,6 +8,16 @@ export interface User {
     password: string;
     isAdmin: boolean;
     dateOfBirth: string;
+    isActive: boolean;
+    userProfile: UserProfileDetails;
+}
+
+export interface UserProfileDetails {
+    jobType: string;
+    salary: string;
+    education: string;
+    profession: string;
+    profileDesc: string;
 }
 
 const UserSchema = new Schema<User>({
@@ -30,6 +40,17 @@ const UserSchema = new Schema<User>({
     isAdmin: {
         type: Boolean,
         required: true
+    },
+    isActive: {
+        type: Boolean,
+        required: true
+    },
+    userProfile: {
+        jobType: String,
+        salary: String,
+        education: String,
+        profession: String,
+        profileDesc: String
     }
 }, {
     timestamps: true,

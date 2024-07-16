@@ -69,7 +69,6 @@ router.post('/', async(req: Request, res: Response) => {
             res.status(HTTP_BAD_REQUEST).send({
                 message: 'Please fill in all fields'
             })
-            throw new Error('Error! Please fill in all fields')
           }
     
           const newJob = { 
@@ -116,7 +115,6 @@ router.put('/:jobId', async(req: Request, res: Response) => {
               res.status(HTTP_BAD_REQUEST).send({
                   message: 'No job found'
               })
-              throw new Error('Error! No job found')
           }
       
           const updatedJobObj = { 

@@ -3,20 +3,26 @@ import { User, UserModel } from '../models/User.model';
 import { HTTP_BAD_REQUEST, HTTP_NOT_FOUND, HTTP_OK } from '../constants/http_status';
 import bcrypt from 'bcryptjs';
 import jwt from 'jsonwebtoken';
+import _ from 'lodash';
 
 const router = express.Router();
 
 router.get('/:id', async (req: Request, res: Response) => {
     const { id } = req.params
-    const user = await UserModel.findById(id);
-
-    if (!user) {
-        res.status(HTTP_NOT_FOUND).send({
-            message: 'No user found'
+    try {
+        const user = await UserModel.findById(id);
+    
+        if (!user) {
+            res.status(HTTP_NOT_FOUND).send({
+                message: 'No user found'
+            })
+        }
+        res.send(user);
+    } catch (error) {
+        res.status(500).send({
+            message: 'Something went wrong on fetching the user'
         })
-        throw new Error('No user found')
     }
-    res.send(user);
 })
 
 router.post('/register', async (req: Request, res: Response) => {
@@ -40,7 +46,19 @@ router.post('/register', async (req: Request, res: Response) => {
             email: email.toLowerCase(),
             password: encryptPassword,
             dateOfBirth,
-            isAdmin: false
+            isAdmin: false,
+            isActive: true,
+            userProfile: {
+                jobType: undefined,
+                salary: undefined,
+                edication: undefined,
+                workExperiences: {
+                    id: '',
+                    role: undefined,
+                    description: undefined
+                },
+                position: undefined
+            }
         }
     
         const saveUser = await UserModel.create(newUser);
@@ -63,6 +81,91 @@ router.post('/login', async (req: Request, res: Response, next: NextFunction) =>
             message: 'Invalid email and passord'
         })
     }
+})
+
+router.get('/', async (req:Request, res: Response) => {
+    try {
+        const users = await UserModel.find()
+        if(_.isEmpty(users)) {
+            res.status(HTTP_NOT_FOUND).send({
+                message: 'No users found'
+            })
+        }
+
+        res.status(HTTP_OK).send(users);
+    } catch (error) {
+        console.error('Error! Sommething went wrong on getting users')
+    }
+})
+
+router.put('/:userId', async (req:Request, res: Response) => {
+    const {
+        fullName,
+        dateOfBirth,
+        // isActive,
+        jobType,
+        salary,
+        education,
+        profession,
+        profileDesc
+        } = req.body
+
+    const { userId } = req.params
+    
+    console.log(dateOfBirth,
+        fullName,
+        jobType,
+        salary,
+        education,
+        profession,
+        profileDesc);
+        try {
+            if(
+                !fullName ||
+                !dateOfBirth ||
+                !jobType ||
+                !salary ||
+                !education ||
+                !profession ||
+                !profileDesc 
+            ) {
+                res.status(HTTP_BAD_REQUEST).send({
+                    message: 'Fill in all fields'
+                })
+                return;
+            }
+            
+            const user = await UserModel.findById(userId)
+
+            if (!user) {
+                res.status(HTTP_NOT_FOUND).send({
+                    message: 'No user found'
+                })
+                return;
+            }
+
+            user.userProfile.jobType = jobType
+            user.userProfile.salary = salary
+            user.userProfile.education = education
+            user.userProfile.profession = profession
+            user.userProfile.profileDesc = profileDesc
+            user.dateOfBirth = dateOfBirth;
+            user.fullName = fullName;
+
+            // user.isActive = isActive;
+            
+
+            const updatedProfile = await user.save();
+            console.log("Profile updated successfully:", updatedProfile);
+            
+            res.send(updatedProfile);
+
+        } catch (error) {
+            res.status(500).send({
+                message: `An error occurred while updating the profile, ${error}`,
+              });
+        }
+
 })
 
 const generateUserToken = (user: User) => {
