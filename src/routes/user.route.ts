@@ -7,21 +7,44 @@ import _ from 'lodash';
 
 const router = express.Router();
 
-router.get('/:id', async (req: Request, res: Response) => {
-    const { id } = req.params
+
+router.get('/search', async (req: Request, res: Response) => {
+    const { searchTerm, jobTypes } = req.query;
+
+    let query: any = {};
+
+    // Search in profession field using searchTerm
+    if (searchTerm) {
+        const searchRegex = new RegExp(searchTerm as string, 'i');
+        query['userProfile.profession'] = { $regex: searchRegex };
+    }
+
+    // Filter by jobTypes
+    if (jobTypes) {
+        const jobTypesArray = (jobTypes as string).split(',');
+        query['userProfile.jobType'] = { $in: jobTypesArray };
+    }
+
     try {
-        const user = await UserModel.findById(id);
-    
-        if (!user) {
+        const users = await UserModel.find(query);
+        res.status(200).send(users);
+    } catch (error) {
+        res.status(500).send({ error: 'Error fetching users' });
+    }
+});
+
+router.get('/', async (req:Request, res: Response) => {
+    try {
+        const users = (await UserModel.find()).filter(user => user.isAdmin !== true )
+        if(_.isEmpty(users)) {
             res.status(HTTP_NOT_FOUND).send({
-                message: 'No user found'
+                message: 'No users found'
             })
         }
-        res.send(user);
+
+        res.status(HTTP_OK).send(users);
     } catch (error) {
-        res.status(500).send({
-            message: 'Something went wrong on fetching the user'
-        })
+        console.error('Error! Sommething went wrong on getting users')
     }
 })
 
@@ -80,21 +103,6 @@ router.post('/login', async (req: Request, res: Response, next: NextFunction) =>
         res.status(HTTP_BAD_REQUEST).send({
             message: 'Invalid email and passord'
         })
-    }
-})
-
-router.get('/', async (req:Request, res: Response) => {
-    try {
-        const users = await UserModel.find()
-        if(_.isEmpty(users)) {
-            res.status(HTTP_NOT_FOUND).send({
-                message: 'No users found'
-            })
-        }
-
-        res.status(HTTP_OK).send(users);
-    } catch (error) {
-        console.error('Error! Sommething went wrong on getting users')
     }
 })
 
@@ -166,6 +174,25 @@ router.put('/:userId', async (req:Request, res: Response) => {
               });
         }
 
+})
+
+
+router.get('/:id', async (req: Request, res: Response) => {
+    const { id } = req.params
+    try {
+        const user = await UserModel.findById(id);
+    
+        if (!user) {
+            res.status(HTTP_NOT_FOUND).send({
+                message: 'No user found'
+            })
+        }
+        res.send(user);
+    } catch (error) {
+        res.status(500).send({
+            message: 'Something went wrong on fetching the user'
+        })
+    }
 })
 
 const generateUserToken = (user: User) => {
