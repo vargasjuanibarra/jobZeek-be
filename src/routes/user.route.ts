@@ -49,7 +49,7 @@ router.get('/', async (req:Request, res: Response) => {
 })
 
 router.post('/register', async (req: Request, res: Response) => {
-    const { fullName, email, password, dateOfBirth } = req.body;
+    const { fullName, email, password, dateOfBirth, isAdmin } = req.body;
 
     const user = await UserModel.findOne({email})
 
@@ -69,19 +69,19 @@ router.post('/register', async (req: Request, res: Response) => {
             email: email.toLowerCase(),
             password: encryptPassword,
             dateOfBirth,
-            isAdmin: false,
+            isAdmin: isAdmin,
             isActive: true,
-            userProfile: {
+            ...(isAdmin && {userProfile: {
                 jobType: undefined,
                 salary: undefined,
-                edication: undefined,
-                workExperiences: {
-                    id: '',
-                    role: undefined,
-                    description: undefined
-                },
+                education: undefined,
+                // workExperiences: {
+                //     id: '',
+                //     role: undefined,
+                //     description: undefined
+                // },
                 position: undefined
-            }
+            }})
         }
     
         const saveUser = await UserModel.create(newUser);

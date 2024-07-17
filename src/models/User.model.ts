@@ -31,7 +31,6 @@ const UserSchema = new Schema<User>({
     },
     dateOfBirth: {
         type: String,
-        required: true
     },
     password: {
         type: String,
