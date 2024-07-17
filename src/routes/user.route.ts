@@ -71,17 +71,20 @@ router.post('/register', async (req: Request, res: Response) => {
             dateOfBirth,
             isAdmin: isAdmin,
             isActive: true,
-            ...(isAdmin && {userProfile: {
+            ...(isAdmin ? {userProfile: {
                 jobType: undefined,
                 salary: undefined,
                 education: undefined,
-                // workExperiences: {
-                //     id: '',
-                //     role: undefined,
-                //     description: undefined
-                // },
                 position: undefined
-            }})
+            }}: {
+                companyProfile: {
+                    companyName: undefined,
+                    industry: undefined,
+                    address: undefined,
+                    contactNumber: undefined,
+                    profileDesc: undefined,
+                }
+            })
         }
     
         const saveUser = await UserModel.create(newUser);
@@ -115,34 +118,17 @@ router.put('/:userId', async (req:Request, res: Response) => {
         salary,
         education,
         profession,
+        companyName,
+        industry,
+        address,
+        country,
+        contactNumber,
         profileDesc
         } = req.body
 
     const { userId } = req.params
     
-    console.log(dateOfBirth,
-        fullName,
-        jobType,
-        salary,
-        education,
-        profession,
-        profileDesc);
         try {
-            if(
-                !fullName ||
-                !dateOfBirth ||
-                !jobType ||
-                !salary ||
-                !education ||
-                !profession ||
-                !profileDesc 
-            ) {
-                res.status(HTTP_BAD_REQUEST).send({
-                    message: 'Fill in all fields'
-                })
-                return;
-            }
-            
             const user = await UserModel.findById(userId)
 
             if (!user) {
@@ -151,17 +137,25 @@ router.put('/:userId', async (req:Request, res: Response) => {
                 })
                 return;
             }
-
-            user.userProfile.jobType = jobType
-            user.userProfile.salary = salary
-            user.userProfile.education = education
-            user.userProfile.profession = profession
-            user.userProfile.profileDesc = profileDesc
-            user.dateOfBirth = dateOfBirth;
-            user.fullName = fullName;
-
-            // user.isActive = isActive;
-            
+            if (user.isAdmin) {
+                user.fullName = fullName;
+                user.dateOfBirth = dateOfBirth;
+                user.companyProfile.profession = profession;
+                user.companyProfile.companyName = companyName;
+                user.companyProfile.industry = industry;
+                user.companyProfile.address = address;
+                user.companyProfile.country = country;
+                user.companyProfile.contactNumber = contactNumber;
+                user.companyProfile.profileDesc = profileDesc;
+            } else {
+                user.userProfile.jobType = jobType
+                user.userProfile.salary = salary
+                user.userProfile.education = education
+                user.userProfile.profession = profession
+                user.userProfile.profileDesc = profileDesc
+                user.dateOfBirth = dateOfBirth;
+                user.fullName = fullName;
+            }
 
             const updatedProfile = await user.save();
             console.log("Profile updated successfully:", updatedProfile);

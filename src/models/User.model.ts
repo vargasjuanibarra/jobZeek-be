@@ -10,6 +10,7 @@ export interface User {
     dateOfBirth: string;
     isActive: boolean;
     userProfile: UserProfileDetails;
+    companyProfile: CompanyProfileDetails;
 }
 
 export interface UserProfileDetails {
@@ -18,6 +19,16 @@ export interface UserProfileDetails {
     education: string;
     profession: string;
     profileDesc: string;
+    country: string;
+}
+export interface CompanyProfileDetails {
+    companyName: string,
+    industry: string,
+    address: string,
+    contactNumber: string,
+    profileDesc: string,
+    country: string,
+    profession: string
 }
 
 const UserSchema = new Schema<User>({
@@ -49,7 +60,17 @@ const UserSchema = new Schema<User>({
         salary: String,
         education: String,
         profession: String,
-        profileDesc: String
+        profileDesc: String,
+        country: String
+    },
+    companyProfile: {
+        companyName: String,
+        industry: String,
+        address: String,
+        contactNumber: String,
+        profileDesc: String,
+        country: String,
+        profession: String
     }
 }, {
     timestamps: true,
