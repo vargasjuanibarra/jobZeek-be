@@ -10,7 +10,7 @@ dbConnect()
 const app = express();
 const PORT = 5000
 
-const allowedOrigins = ['https://jobzeek.netlify.app/'];
+const allowedOrigins = ['https://jobzeeker-fe.onrender.com'];
 
 const options: cors.CorsOptions = {
   origin: allowedOrigins
