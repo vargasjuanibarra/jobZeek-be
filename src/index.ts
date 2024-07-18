@@ -22,7 +22,7 @@ app.use(express.json());
 app.use(express.urlencoded({extended: false}))
 
 app.use('/jobs', JobRoutes)
-app.use('/user', UserRoutes)
+app.use('/users', UserRoutes)
 
 app.listen(PORT, () => {
     console.log(`server running on port ${PORT}`);
