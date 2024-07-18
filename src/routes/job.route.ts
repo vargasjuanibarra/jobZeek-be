@@ -27,12 +27,11 @@ router.get('/', async(req: Request, res:Response) => {
     try {
         const jobs = await JobModel.find();
     
-        if(_.isEmpty(jobs)) {
-            res.status(HTTP_NOT_FOUND).send({
-                message: 'No jobs found'
-            });
-            throw new Error('Error! No existing jobs found')
-        }
+        // if(_.isEmpty(jobs)) {
+        //     res.status(HTTP_NOT_FOUND).send({
+        //         message: 'No jobs found'
+        //     });
+        // }
         res.status(HTTP_OK).send(jobs)
     } catch (error) {
         console.error('Error on getting job', error);

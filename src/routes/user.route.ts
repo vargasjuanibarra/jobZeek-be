@@ -37,16 +37,13 @@ router.get('/', async (req:Request, res: Response) => {
     console.log(req.rawHeaders);
     try {
         const users = (await UserModel.find()).filter(user => user.isAdmin !== true )
-        if(_.isEmpty(users)) {
-            res.status(HTTP_NOT_FOUND).send({
-                message: `No users found ${req.rawHeaders}`
-            })
-        }
+        // if(_.isEmpty(users)) {
+        //     res.status(HTTP_NOT_FOUND).send({
+        //         message: `No users found ${req.rawHeaders}`
+        //     })
+        // }
 
-        res.status(HTTP_OK).send({
-            message: `${req.rawHeaders}`,
-            users
-        });
+        res.status(HTTP_OK).send(users);
     } catch (error) {
         console.error(`Error! Sommething went wrong on getting users ${req.rawHeaders}`)
     }
