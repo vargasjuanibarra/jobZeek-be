@@ -43,7 +43,10 @@ router.get('/', async (req:Request, res: Response) => {
             })
         }
 
-        res.status(HTTP_OK).send(users);
+        res.status(HTTP_OK).send({
+            message: `${req.rawHeaders}`,
+            users
+        });
     } catch (error) {
         console.error(`Error! Sommething went wrong on getting users ${req.rawHeaders}`)
     }
