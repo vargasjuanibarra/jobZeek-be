@@ -10,7 +10,7 @@ dbConnect()
 const app = express();
 const PORT = 5000
 
-const allowedOrigins = ['https://jobzeeker-fe.onrender.com'];
+const allowedOrigins = ['https://jobzeeker-fe.onrender.com', 'http://localhost:3000/'];
 
 const options: cors.CorsOptions = {
   origin: allowedOrigins
